@@ -11,6 +11,7 @@ app.use(logger('dev'));
 app.use(bodyPareser.json());
 app.use(bodyPareser.urlencoded({extended: false}));
 
+require('./server/routes')(app)
 app.get('*', (req, res) => res.status(200).send({
   message: 'Welcome to cool stuff',
 }));
