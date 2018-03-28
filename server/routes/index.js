@@ -1,17 +1,31 @@
 const todosController = require('../controllers').todos;
 const todoItemsController = require('../controllers').todoItems;
 const usersController = require('../controllers').users;
+const jwt = require('jsonwebtoken');
+const config = require('../../config');
+
 
 module.exports = (app) => {
   app.get('/api', (req, res) => res.status(200).send({
     message: 'Welcome to todos API',
   }));
 
+  app.use('/api/todos', (req, res, next) => {
+    jwt.verify(req.headers.authorization, config.secret, (err, decoded) => {
+      if (err) {
+        return res.status(401).send({ message: 'Invalid token' });
+      }
+      req.user = decoded;
+      next();
+    });
+  });
+
   app.post('/api/users/signIn', usersController.signIn);
   app.post('/api/users/signUp', usersController.signUp);
   app.put('/api/users/update', usersController.update);
   app.post('/api/todos', todosController.create);
   app.get('/api/todos', todosController.list);
+  app.put('/api/todos/:todoId', todosController.update);
   app.post('/api/todos/:todoId/items', todoItemsController.create);
   app.get('/api/todos/:todoId', todosController.retrieve);
   app.delete('/api/todos/:todoId', todosController.destroy);

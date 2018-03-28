@@ -6,6 +6,7 @@ module.exports = {
     return Todo
       .create({
         title: req.body.title,
+        userId: req.user.id,
       })
     .then(todo => res.status(201).send(todo))
     .catch(error => res.status(400).send(error));
@@ -40,10 +41,10 @@ module.exports = {
     .catch(error => res.status(400).send(error));
   },
   update(req, res) {
-    return Todo.findById(req.params.todoID, {
+    return Todo.findById(req.params.todoId, {
       include: [{
         model: TodoItem,
-        AS: 'todoItems',
+        as: 'todoItems',
       }],
     })
       .then(todo => {
