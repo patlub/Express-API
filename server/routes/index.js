@@ -1,7 +1,8 @@
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const todosController = require('../controllers').todos;
 const todoItemsController = require('../controllers').todoItems;
 const usersController = require('../controllers').users;
-const jwt = require('jsonwebtoken');
 const config = require('../../config');
 
 
@@ -10,6 +11,7 @@ module.exports = (app) => {
     message: 'Welcome to todos API',
   }));
 
+  app.use(cors());
   app.use('/api/todos', (req, res, next) => {
     jwt.verify(req.headers.authorization, config.secret, (err, decoded) => {
       if (err) {
