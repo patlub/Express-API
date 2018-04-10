@@ -10,10 +10,10 @@ module.exports = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 8),
+        password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10)),
       })
       .then(user => {
-        const token  = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 });
+        const token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 });
         return res.status(201).send({ auth: true, token });
       })
       .catch(error => res.status(400).send(error));
@@ -23,16 +23,15 @@ module.exports = {
       .find({
         where: {
           email: req.body.email,
-          password: bcrypt.hashSync(req.body.password, 8),
         },
       })
       .then(user => {
-        if (!user) {
+        if (!bcrypt.compareSync(req.body.password, user.password)) {
           return res.status(404).send({
             message: 'User not Found',
           });
         }
-        const token  = jwt.sign({ id: user.id }, config.secret, { expiry: 86400 });
+        const token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 });
         res.status(201).send({ auth: true, token });
       })
       .catch(error => res.status(400).send(error));
